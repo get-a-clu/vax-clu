@@ -1,0 +1,243 @@
+
+                                VAX CLU RELEASE
+
+              for Digital Vax Computers running UNIX 4.2 and 4.3
+
+                          Distribution of 26 May 1989
+
+1 Notes
+   CLU is no longer licensed.  See ~CLU/COPYRIGHT for distribution information.
+
+   If  you  have  problems with this distribution, you can call Paul Johnson or
+Dorothy Curtis at (617) 253-1945 to get help.  If you find bugs, please tell us
+about   them,   either   in   writing   or   by   sending   network   mail   to
+PRJ@PM-PRJ.LCS.MIT.EDU and/or DCurtis@MESON.LCS.MIT.EDU.  We do  not  have  the
+time  or  the  staff  for "releases"; you will have to either FTP a new copy or
+request a distribution tape (for a fee)  periodically.    The  sytem  is  quite
+stable;  no  changes other than bug fixes are contemplated.  We are now hard at
+work on Argus, the distributed computing successor to CLU.
+
+   The CLU Reference Manual is currently  published  by  Springer-Verlag  as  a
+monograph,  ISBN  0-387-91253-3 or ISBN 3-540-91253-3. Formerly it was in their
+Lecture Notes in Computer Science series, Number  114.    The  manual  is  also
+included  as  an  appendix to the book Abstraction and Specification in Program
+Development by Barbara Liskov and John Guttag, published in  1986  by  The  MIT
+Press (ISBN 0-262-12112-3) and McGraw-Hill (ISBN 0-07-037996-3).
+
+   CLU  modules  cannot  be  linked  into  programs in other languages, nor can
+modules written in other languages be linked with CLU programs.  The  parts  of
+the  CLU system which are not written in CLU itself are written in Vax assembly
+language using a special assembler developed for  CLU.  The  assembler,  called
+asm,  is  included  with this distribution. If it were absolutely necessary you
+could hand-code CLU-compatible assembly routines. But BEWARE!  There is  little
+or  no  documentation  of  the  assembler  or the system, but there are a large
+number of rules that must be obeyed if the integrity of the  system  is  to  be
+maintained. Avoid writing assembly language at all costs!
+
+   The  destination  machine  must have Release 4.2 or 4.3 of Berkeley Unix (or
+compatible systems such as DEC's Ultrix).  If you are moving from 4.1 to 4.2 or
+4.3,  you  generally  do  not  have  to  recompile anything, but you do have to
+relink.  See ~CLU/4.2.changes for changes from 4.1 CLU.
+
+   The released implementation is configured to run under 4.3  Unix  with  NFS.
+If  you  are  running under 4.2 you must modify the distribution.  See the file
+~CLU/4.2/README for additional instructions on  installing  changed  files  and
+building  new  executables.    If you are running under 4.3 without NFS you may
+have problems with the released distribution  and  should  also  make  the  4.2
+modifications.    Problems  would most likely arise with doing star matching of
+file names.
+
+2 Installation
+   If you are installing a new version of the CLU  system,  you  should  backup
+your current system onto tape before loading the new system over it.
+
+   The  system  files  and  directories  are set up to live under a single root
+directory, and most system programs will not work reasonably if the files  live
+elsewhere.    (The  executable  files  in  the exe directory may live anywhere,
+however).  There is some flexibility in where the CLU  root  directory  can  be
+installed.  The possibilities (in the order searched) are
+
+   1. the directory specified by the environment variable CLUHOME
+
+   2. the home directory, as listed in /etc/passwd, of user name CLU
+
+   3. /usr/local/lib/clu
+
+   4. /usr/lib/clu
+
+   5. /usr/clu
+
+   Any such directory can, of course, be a symbolic link to the real directory.
+In the file/directory names in this and other CLU documents, ~CLU  is  used  to
+represent  the  CLU  root directory.  (In fact, this can be used within any CLU
+program to refer to the root.)
+
+   There is one tar file on the tape.  If you are using a tape device connected
+directly  to  the Vax, you can extract the files by creating ~CLU, mounting the
+tape, connecting to ~CLU, and issuing the command tar x
+
+   If the compiler and assembler do not work right off the tape:
+
+   - To get the compiler to work, delete ~CLU/cmp/state.??? and  then  run
+     ~CLU/exe/clu.    When you get the prompt "command(s): ", type "kill".
+     Check the file ~CLU/cmp/basic.junk to make sure there are  no  errors
+     (gcd_tab  being  undefined  is  OK),  then  delete  it.    To get the
+     assembler  to  work,   delete   ~CLU/asm/state.???   and   then   run
+     ~CLU/exe/asm.    When  you  get  the  prompt  "FILE(S) = ", type "^D"
+     (control-D).
+
+   - If the debugger doesn't work off the tape, try recreating  the  basic
+     run-time      system     by     deleting     ~CLU/sys/basesys     and
+     ~CLU/sys/basesys.dump and  then  issuing  the  command  ~CLU/exe/link
+     #init
+
+   If you want the executables in ~CLU/exe to live elsewhere, move them.
+
+   The   entire  system  totals  about  9Mb.    If  you  only  want  a  minimum
+configuration,  about  2Mb,  only  the  following  directories  and  files  are
+necessary:
+
+    ~CLU
+            clu.hacks       Information about special CLU features.
+            clu.info        Information about the CLU compiler.
+            clu.opts        Information about code optimizations.
+            clu.order       Simple compiler command list.
+            linker.help     Linker documentation.
+            stream.changes  Additional stream operations.
+            system.intro    Introduction to the debugging system.
+            system.names    Names of modules used in the CLU system.
+            trace.cmsd_help Brief help message for trace package.
+
+    ~CLU/bin
+            *               Binaries for the run-time system.
+
+    ~CLU/cmp
+            basic.types     Only needed long enough to recreate
+                            state.??? file.
+            state.???       Compiler state file.
+
+    ~CLU/exe
+            clu             The CLU compiler.
+            clugprof        The version of gprof(1) for CLU programs.
+            debug           The CLU linker (debugging interface).
+            link            The CLU linker (production interface).
+
+    ~CLU/lib
+            short.help      Brief description of library modules.
+            *.spc           Interface specifications for many modules.
+            *.lib           Compiler interface libraries.
+
+    ~CLU/link
+            spcl_syms.txt   Linker global symbols.
+
+    ~CLU/sys
+            basesys         Run-time system for DEBUG.
+            basesys.dump    Database for DEBUG.
+            gprof.xload     Load file for profiling.
+
+    ~CLU/sys/gprof
+            *.bin           Binaries for profiling.
+
+   If  you  wish  to  hand-code  CLU-compatible  assembly  routines,  then  the
+following directories and files are necessary or useful:
+
+    ~CLU/asm
+            addr.defs       Only needed long enough to recreate
+                            state.?? file.
+            opcode.defs     Ditto.
+            perm.defs       Ditto.
+            state.??        ASM state file.
+
+    ~CLU/dbg
+            dbg.doc         DBG documentation.
+
+    ~CLU/exe
+            asm             The CLU assembler.
+            dbg             CLU-oriented version of ADB.
+
+   Note: The sources to DBG are not normally distributed.  Contact  us  if  you
+need them.  We may require a copy of your Unix source license.
+
+   If  a  real-time  editor with some special CLU features is desired, then the
+following files are necessary or useful:
+
+    ~CLU
+            ted.chart       TED command chart.
+            ted.hlp         Documentation about TED.
+            ted.press       PRESS file of ted.hlp.
+            ted.vt100       VT100 termcap entries we use with TED.
+
+    ~CLU/exe
+            ted             A real-time editor written in CLU.
+
+   A few utilities that may be useful:
+
+    ~CLU
+            calc.hlp        CALC documentation.
+            compare.hlp     COMPARE documentation.
+
+    ~CLU/exe
+            calc            Simple calculator.
+            compare         Text/binary file comparison program.
+            gcdprt          Print gc_dump and compiler binary files.
+            liblst          List modules in compiler library files.
+
+   For more system information:
+
+    ~CLU/
+            howto.cons      How to recreate system programs.
+            system.files    More directory/file information.
+
+3 Bugs
+
+
+
+3.1 Unix 4.2bsd
+   There was a 4.2 kernel bug that caused the wait3() system call to lose,  and
+hence  running  programs under TED's "^J" command failed if they suspended.  If
+you run into this  problem  look  into  fixing  it  by  changing  the  code  in
+/sys/vax/trap.c, in syscall(), from
+                    locr0[PS] &= ~PSL_C;
+                    if (u.u_eosys == RESTARTSYS)
+                            pc = opc;
+            #ifdef notdef
+                    else if (u.u_eosys == SIMULATERTI)
+                            dorti();
+            #endif
+                    else if (u.u_error) {
+            #ifndef lint
+            bad:
+            #endif
+                            locr0[R0] = u.u_error;
+                            locr0[PS] |= PSL_C;     /* carry bit */
+                    } else {
+                            locr0[R0] = u.u_r.r_val1;
+                            locr0[R1] = u.u_r.r_val2;
+                    }
+
+   to
+
+                    if (u.u_eosys == RESTARTSYS)
+                            pc = opc;
+            #ifdef notdef
+                    else if (u.u_eosys == SIMULATERTI)
+                            dorti();
+            #endif
+                    else if (u.u_error) {
+            #ifndef lint
+            bad:
+            #endif
+                            locr0[R0] = u.u_error;
+                            locr0[PS] |= PSL_C;     /* carry bit */
+                    } else {
+                            locr0[PS] &= ~PSL_C;    /* clear carry bit */
+                            locr0[R0] = u.u_r.r_val1;
+                            locr0[R1] = u.u_r.r_val2;
+                    }
+
+
+
+3.2 Unix 4.3bsd
+   For  microvaxes running 4.3bsd the emulation code for the matchc instruction
+may need to be fixed. (This instruction is not emulated on 750's....)  See  the
+~CLU/4.3/unix/emods.s file for details on a fix to matchc.
